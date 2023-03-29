@@ -1,5 +1,6 @@
 from email.message import EmailMessage
-import ssl, smtplib
+import ssl
+import smtplib
 
 email_sender = 'warhiocodetest@gmail.com'
 email_pass = 'hgegikakxnnfnngo'

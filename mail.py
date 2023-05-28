@@ -2,8 +2,8 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 
-email_sender = 'warhiocodetest@gmail.com'
-email_pass = 'hgegikakxnnfnngo'
+email_sender = 'ichazybot@gmail.com'
+email_pass = 'jgmdymicrbzysqho'
 
 
 def send(email_receiver, subject, content):

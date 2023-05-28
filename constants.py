@@ -10,7 +10,7 @@ USER_FINAL_QUESTION_SECOND_TRY = 3
 USER_LOGIN = 4
 
 
-SUPPORT_EMAIL = 'matvey.i.zakharov@gmail.com'
+SUPPORT_EMAIL = 'ichazybot@gmail.com'
 
 # Bot
 

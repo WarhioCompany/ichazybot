@@ -220,6 +220,3 @@ def start_bot():
         bot.send_message(message.from_user.id, PROMO_SUCCESS)
 
     bot.polling(none_stop=True, interval=0)
-
-
-start_bot()

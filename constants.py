@@ -71,9 +71,6 @@ CUTIES = ['https://tenor.com/ru/view/sloth-smile-slow-smooth-hd-neuron-activatio
 
 
 def get_config():
-    global SUPPORT_EMAIL
-    SUPPORT_EMAIL = 'matvey.i.zakharov@gmail.com'
-    return
     global TOKEN
     global RANDOM_GIF_BUTTON_NAME, RECOVER_PASS_BUTTON_NAME, PROMO_BUTTON_NAME, STORE_BUTTON_NAME,\
         PARTNERSHIP_BUTTON_NAME, WELCOME_MESSAGE, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY, TRY_AGAIN_MESSAGE, \

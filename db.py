@@ -2,7 +2,6 @@ from sshtunnel import SSHTunnelForwarder
 import sshtunnel
 import logging
 import psycopg2 as pg
-import pandas as pd
 
 creds = {
     "PG_UN": "ichazy_user",

@@ -133,6 +133,4 @@ def get_config():
         CUTIES = cuties.split('\n')
 
         time.sleep(delay - ((time.time() - start_time) % delay))
-
-
-#Success Change
+print('Hello world')

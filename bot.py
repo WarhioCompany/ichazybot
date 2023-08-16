@@ -2,20 +2,24 @@ import telebot
 from telebot import types
 import db
 from send_mails import *
-from constants import *
+from config_updater import constants
 from hashlib import md5
 from random import randint
 import threading
 import promocodes as promo
+from constants import *
+
+
+def start_thread(func):
+    x = threading.Thread(target=func, daemon=True)
+    x.start()
 
 
 def start_bot():
     db.connect()
     promo.start()
     bot = telebot.TeleBot(TOKEN)
-
-    x = threading.Thread(target=get_config, daemon=True)
-    x.start()
+    start_thread(get_config)
 
     users_status = {}
     users_question = {}
@@ -218,5 +222,6 @@ def start_bot():
         promo.delete_info(message.from_user.id)
         bot.send_message(message.from_user.id, PROMO_SUCCESS)
 
-    bot.infinity_polling(True)
+    bot.infinity_polling()
     #bot.polling(none_stop=True, interval=0)
+    print('hi')

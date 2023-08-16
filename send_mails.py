@@ -1,5 +1,4 @@
 import mail
-from constants import *
 
 
 def send_forgotten_pass(email, password):

@@ -206,9 +206,4 @@ def get_config():
         cuties = requests.get('https://raw.githubusercontent.com/WarhioCompany/ichazybot/main/cuties.txt').text
         CUTIES = cuties.split('\n')
 
-<<<<<<< HEAD
         time.sleep(CONFIG_PARSE_DELAY_SECONDS - ((time.time() - start_time) % CONFIG_PARSE_DELAY_SECONDS))
-=======
-        time.sleep(delay - ((time.time() - start_time) % delay))
-print('Hello world')
->>>>>>> 0552a9cac5f802bbce486e6c2062c4c527d8ce68

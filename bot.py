@@ -76,7 +76,6 @@ def start_bot():
     @bot.message_handler(content_types=['text'])
     def get_text_messages(message):
         add_if_not_there(users_status, message.from_user.id, EMPTY)
-
         if message.text == RECOVER_PASS_BUTTON_NAME:
             bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY)
         elif message.text == RANDOM_GIF_BUTTON_NAME:
@@ -219,4 +218,5 @@ def start_bot():
         promo.delete_info(message.from_user.id)
         bot.send_message(message.from_user.id, PROMO_SUCCESS)
 
-    bot.polling(none_stop=True, interval=0)
+    bot.infinity_polling(True)
+    #bot.polling(none_stop=True, interval=0)

@@ -18,16 +18,19 @@ SUPPORT_EMAIL = 'ichazybot@gmail.com'
 
 # Bot
 
-TOKEN = '5941370506:AAF3BglIIg6VlCP-Ppa0FiOPIC2bDf1O4SU'
+# TOKEN = '5941370506:AAF3BglIIg6VlCP-Ppa0FiOPIC2bDf1O4SU'
 
 # TEST TEST TEST TEST TEST !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# TOKEN = '6098601821:AAHmo_e03absU9-1eFoTwsoJs0GX2_koLPk'
+TOKEN = '6098601821:AAHmo_e03absU9-1eFoTwsoJs0GX2_koLPk'
 
 RANDOM_GIF_BUTTON_NAME = 'Милашка'
 RECOVER_PASS_BUTTON_NAME = 'Восстановить пароль'
 PROMO_BUTTON_NAME = 'Промокод'
 STORE_BUTTON_NAME = 'Мерч'
 PARTNERSHIP_BUTTON_NAME = 'Сотрудничество'
+
+RETURN_MENU_BUTTON = 'Вернуться в меню'
+RETURN_MENU_MESSAGE = 'Меню'
 
 WELCOME_MESSAGE = 'Привет, я Чейзи. Я умею много чего, что ты выбираешь?'
 WRITE_YOUR_EMAIL_MESSAGE_RECOVERY = 'Напиши свой email, указанный при регистрации в приложении'
@@ -37,6 +40,7 @@ GOT_LOGIN = 'Сейчас все проверим, и я свяжусь с то�
 ANSWER_QUESTIONS = 'Нашел тебя, но сперва ответь на проверочные вопросы'
 
 WRITE_YOUR_EMAIL_MESSAGE = 'Напиши свой email, указанный при регистрации в приложении'
+EMAIL_IS_NOT_VALID = 'Возможно какая-то опечатка, такой email не возможен'
 FOUND_YOUR_EMAIL_MESSAGE = 'Нашел твой email, хочешь изменить? {email}'
 WRITE_PROMO_IDENTIFIER_EMAIL = 'Напиши свой email, указанный при регистрации промокода'
 WRITE_PROMO_IDENTIFIER_PHONE = 'Напиши свой телефон, указанный при регистрации промокода'
@@ -51,6 +55,9 @@ STORE_SELECT_COLOR = 'Выбери цвет'
 STORE_SELECT_PRINT = 'Выбери принт'
 STORE_SELECT_SIZE = 'Выбери цвет'
 STORE_SELECT_STICKER_PACK_ID = 'Выбери стикерпак'
+
+STORE_SELLER_ACC = 'ocharovvan'
+PARTNERSHIP_ACC = 'mikeept'
 
 QUESTION_FAILURE_MESSAGE = "Соберись и попробуй еще раз!"
 QUESTION_SECOND_FAILURE_MESSAGE = "Увы, но сегодня тебе не светит понежиться на веточках скидок и бонусов со мной, попробуй завтра"
@@ -97,6 +104,9 @@ def make_config():
     config = {}
     config['TOKEN'] = TOKEN
 
+    config['RETURN_MENU_MESSAGE'] = RETURN_MENU_MESSAGE
+    config['RETURN_MENU_BUTTON'] = RETURN_MENU_BUTTON
+
     config['RANDOM_GIF_BUTTON_NAME'] = RANDOM_GIF_BUTTON_NAME
     config['RANDOM_GIF_BUTTON_NAME'] = RECOVER_PASS_BUTTON_NAME
     config['PROMO_BUTTON_NAME'] = PROMO_BUTTON_NAME
@@ -126,6 +136,9 @@ def make_config():
     config['STORE_SELECT_SIZE'] = STORE_SELECT_SIZE
     config['STORE_SELECT_STICKER_PACK_ID'] = STORE_SELECT_STICKER_PACK_ID
 
+    config['STORE_SELLER_ACC'] = STORE_SELLER_ACC
+    config['PARTNERSHIP_ACC'] = PARTNERSHIP_ACC
+
     config['QUESTION_FAILURE_MESSAGE'] = QUESTION_FAILURE_MESSAGE
     config['QUESTION_SECOND_FAILURE_MESSAGE'] = QUESTION_SECOND_FAILURE_MESSAGE
 
@@ -137,20 +150,17 @@ def make_config():
     return config
 
 
-def make_config_file():
-    with open('config.json', 'w+', encoding='utf-8') as file:
-        file.write(json.dumps(make_config(), indent=4, separators=(',', ': '), sort_keys=True, ensure_ascii=False))
-
-
 def get_config():
     global TOKEN
     global RANDOM_GIF_BUTTON_NAME, RECOVER_PASS_BUTTON_NAME, PROMO_BUTTON_NAME, STORE_BUTTON_NAME, \
         PARTNERSHIP_BUTTON_NAME, WELCOME_MESSAGE, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY, TRY_AGAIN_MESSAGE, \
         WRITE_YOUR_NICKNAME, GOT_LOGIN, ANSWER_QUESTIONS
+    global RETURN_MENU_BUTTON, RETURN_MENU_MESSAGE
     global WRITE_YOUR_EMAIL_MESSAGE, FOUND_YOUR_EMAIL_MESSAGE, WRITE_PROMO_IDENTIFIER_EMAIL, \
         WRITE_PROMO_IDENTIFIER_PHONE
     global SELECT_AUTHOR_MESSAGE, ENTER_PROMO_MESSAGE, PROMO_SUCCESS, PROMO_FAILURE
     global STORE_SELECT_TYPE, STORE_SELECT_COLOR, STORE_SELECT_PRINT, STORE_SELECT_SIZE, STORE_SELECT_STICKER_PACK_ID
+    global STORE_SELLER_ACC, PARTNERSHIP_ACC
     global QUESTION_FAILURE_MESSAGE, QUESTION_SECOND_FAILURE_MESSAGE
     global SUCCESS, QUESTIONS, CUTIES
     global CONFIG_PARSE_DELAY_SECONDS
@@ -161,9 +171,12 @@ def get_config():
         config = json.loads(
             requests.get('https://raw.githubusercontent.com/WarhioCompany/ichazybot/main/config.json').text)
 
-        print(config)
+        print(str(config)[:150]+'...')
 
         TOKEN = config['TOKEN']
+
+        RETURN_MENU_MESSAGE = config['RETURN_MENU_MESSAGE']
+        RETURN_MENU_BUTTON = config['RETURN_MENU_BUTTON']
 
         RANDOM_GIF_BUTTON_NAME = config['RANDOM_GIF_BUTTON_NAME']
         RECOVER_PASS_BUTTON_NAME = config['RANDOM_GIF_BUTTON_NAME']
@@ -194,6 +207,9 @@ def get_config():
         STORE_SELECT_SIZE = config['STORE_SELECT_SIZE']
         STORE_SELECT_STICKER_PACK_ID = config['STORE_SELECT_STICKER_PACK_ID']
 
+        STORE_SELLER_ACC = config['STORE_SELLER_ACC']
+        PARTNERSHIP_ACC = config['PARTNERSHIP_ACC']
+
         QUESTION_FAILURE_MESSAGE = config['QUESTION_FAILURE_MESSAGE']
         QUESTION_SECOND_FAILURE_MESSAGE = config['QUESTION_SECOND_FAILURE_MESSAGE']
 
@@ -207,3 +223,8 @@ def get_config():
         CUTIES = cuties.split('\n')
 
         time.sleep(CONFIG_PARSE_DELAY_SECONDS - ((time.time() - start_time) % CONFIG_PARSE_DELAY_SECONDS))
+
+
+def make_config_file():
+    with open('config.json', 'w+', encoding='utf-8') as file:
+        file.write(json.dumps(make_config(), indent=4, separators=(',', ': '), sort_keys=True, ensure_ascii=False))

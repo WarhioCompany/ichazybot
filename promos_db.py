@@ -102,3 +102,6 @@ def add_email(user, email):
 def test_values():
     add_promos([("Tinkoff", 'promo', 'email'), ("Влад A4", 'promo', 'phone'), ("Putin", 'promo', 'phone'),
                 ("Porter Robinson", "promo", "email")])
+
+
+print_rows(PROMO_DB)

@@ -2,12 +2,12 @@ import telebot
 from telebot import types
 import db
 from send_mails import *
-from config_updater import constants
 from hashlib import md5
 from random import randint
 import threading
 import promocodes as promo
 from constants import *
+import re
 
 
 def start_thread(func):
@@ -26,10 +26,13 @@ def start_bot():
     users_secrets = {}
     users_trial_emails = {}
 
-    def make_buttons(names):
+    def make_buttons(names, return_menu=True):
         markup = types.InlineKeyboardMarkup()
         for name in names:
             markup.add(types.InlineKeyboardButton(name, callback_data=md5(name.encode()).hexdigest()))
+        if return_menu:
+            markup.add(types.InlineKeyboardButton(RETURN_MENU_BUTTON,
+                                                  callback_data=md5(RETURN_MENU_BUTTON.encode()).hexdigest()))
         return markup
 
     def make_buttons_row(names, width):
@@ -44,6 +47,9 @@ def start_bot():
                                       [PROMO_BUTTON_NAME, STORE_BUTTON_NAME], [PARTNERSHIP_BUTTON_NAME]]]
         return markup
 
+    def is_email_valid(email):
+        return re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', email)
+
     def question_string(id):
         return list(QUESTIONS.keys())[users_question[id]]
 
@@ -54,12 +60,18 @@ def start_bot():
 
     @bot.callback_query_handler(func=lambda call: True)
     def callback_query(message):
-        if any(md5(i.encode()).hexdigest() == message.data for i in promo.get_names()):
+        if message.data == md5(RETURN_MENU_BUTTON.encode()).hexdigest():
+            return_to_menu(message)
+        elif any(md5(i.encode()).hexdigest() == message.data for i in promo.get_names()):
             promo_select(message)
         elif users_status[message.from_user.id] == USER_CHANGE_EMAIL:
             change_email_handle(message)
         else:
             answer_questions(message)
+        bot.answer_callback_query(message.id)
+
+    def return_to_menu(message):
+        bot.send_message(message.from_user.id, RETURN_MENU_MESSAGE, reply_markup=menu_keyboard())
 
     def promo_select(message):
         promo.set_author_md5(message.data, message.from_user.id)
@@ -109,7 +121,7 @@ def start_bot():
         email = promo.get_saved_email(message.from_user.id)
         if email:
             bot.send_message(message.from_user.id, FOUND_YOUR_EMAIL_MESSAGE.format(email=email),
-                             reply_markup=make_buttons(['Да', 'Нет']))
+                             reply_markup=make_buttons(['Нет', 'Да']))
             users_status[message.from_user.id] = USER_CHANGE_EMAIL
         else:
             enter_email_message_and_status(message)
@@ -118,18 +130,25 @@ def start_bot():
         bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE)
         users_status[message.from_user.id] = USER_ENTER_EMAIL
 
-    def send_redirect_message(chat_id, message_text, button_text, url):
+    def send_redirect_message(chat_id, message_text, button_text, url, additional_buttons=None):
         buttons = types.InlineKeyboardMarkup()
         buttons.add(types.InlineKeyboardButton(button_text, url=url))
-        bot.send_message(chat_id, message_text, reply_markup=buttons)
+        [buttons.add(types.InlineKeyboardButton(button)) for button in additional_buttons] if additional_buttons else []
+        return bot.send_message(chat_id, message_text, reply_markup=buttons)
 
     def store_button(message):
-        send_redirect_message(message.from_user.id, 'Связаться с продавцом', 'Перейти', 'https://t.me/timofeyboichuk')
+        send_redirect_message(message.from_user.id, 'Связаться с продавцом', 'Перейти',
+                              f'https://t.me/{STORE_SELLER_ACC}', ['Вернуться'])
 
     def partnership_reply(message):
-        send_redirect_message(message.from_user.id, 'Сотрудничество', 'Сотрудничать', 'https://t.me/mikeept')
+        send_redirect_message(message.from_user.id, 'Сотрудничество', 'Сотрудничать',
+                              f'https://t.me/{PARTNERSHIP_ACC}', ['Вернуться'])
 
     def enter_email(message):
+        if not is_email_valid(message.text):
+            email_is_not_valid(message)
+            return
+
         if db.get_pass_by_email(message.text):
             promo.save_email(message.from_user.id, message.text)
             select_author(message)
@@ -142,6 +161,10 @@ def start_bot():
                          reply_markup=make_buttons(promo.get_names()))
 
     def password_recovery(message):
+        if not is_email_valid(message.text):
+            email_is_not_valid(message)
+            return
+
         data = db.get_pass_by_email(message.text)
         if data:
             bot.send_message(message.from_user.id, ANSWER_QUESTIONS)
@@ -152,13 +175,19 @@ def start_bot():
                              reply_markup=make_buttons(
                                  list(QUESTIONS.values())[users_question[message.from_user.id]][0]), parse_mode='HTML')
         else:
-            if message.from_user.id not in users_trial_emails:
-                bot.send_message(message.from_user.id, TRY_AGAIN_MESSAGE)
-                users_trial_emails[message.from_user.id] = [message.text]
-            else:
-                bot.send_message(message.from_user.id, WRITE_YOUR_NICKNAME)
-                users_status[message.from_user.id] = USER_EMAIL_NOT_FOUND
-                users_trial_emails[message.from_user.id].append(message.text)
+            email_not_found_try_again_or_support(message)
+
+    def email_not_found_try_again_or_support(message):
+        if message.from_user.id not in users_trial_emails:
+            bot.send_message(message.from_user.id, TRY_AGAIN_MESSAGE)
+            users_trial_emails[message.from_user.id] = [message.text]
+        else:
+            bot.send_message(message.from_user.id, WRITE_YOUR_NICKNAME)
+            users_status[message.from_user.id] = USER_EMAIL_NOT_FOUND
+            users_trial_emails[message.from_user.id].append(message.text)
+
+    def email_is_not_valid(message):
+        bot.send_message(message.from_user.id, EMAIL_IS_NOT_VALID)
 
     def answer_questions(message):
         if md5(list(QUESTIONS.values())[users_question[message.from_user.id]][1].encode()).hexdigest() == message.data:
@@ -220,8 +249,6 @@ def start_bot():
                         promo.get_promo(message.from_user.id),
                         message.text)
         promo.delete_info(message.from_user.id)
-        bot.send_message(message.from_user.id, PROMO_SUCCESS)
+        bot.send_message(message.from_user.id, PROMO_SUCCESS, reply_markup=menu_keyboard())
 
     bot.infinity_polling()
-    #bot.polling(none_stop=True, interval=0)
-    print('hi')

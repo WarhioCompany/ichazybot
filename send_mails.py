@@ -1,4 +1,5 @@
 import mail
+from constants import SUPPORT_EMAIL
 
 
 def send_forgotten_pass(email, password):
@@ -18,9 +19,6 @@ def send_forgotten_email(nickname, emails, telegram_username):
 
 # chazy email, telegram?, promo_author, promo, identification c
 def send_promo_info(ichazy_email, promo_author, promo, identification):
-    global SUPPORT_EMAIL
-    print(SUPPORT_EMAIL)
-    SUPPORT_EMAIL = 'matvey.i.zakharov@gmail.com'
     mail.send(SUPPORT_EMAIL, f'{promo_author} PROMO ({promo})',
               f'IChazy email: {ichazy_email}\n'
               f'Identification: {identification}\n'

@@ -93,7 +93,7 @@ def start_bot():
     def get_text_messages(message):
         add_if_not_there(users_status, message.from_user.id, EMPTY)
         if message.text == RECOVER_PASS_BUTTON_NAME:
-            bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY)
+            bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY, reply_markup=make_buttons([]))
         elif message.text == RANDOM_GIF_BUTTON_NAME:
             random_gif(message)
         elif message.text == PROMO_BUTTON_NAME:
@@ -130,19 +130,19 @@ def start_bot():
         bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE)
         users_status[message.from_user.id] = USER_ENTER_EMAIL
 
-    def send_redirect_message(chat_id, message_text, button_text, url, additional_buttons=None):
+    def send_redirect_message(chat_id, message_text, button_text, url):
         buttons = types.InlineKeyboardMarkup()
         buttons.add(types.InlineKeyboardButton(button_text, url=url))
-        [buttons.add(types.InlineKeyboardButton(button)) for button in additional_buttons] if additional_buttons else []
+        buttons.add(types.InlineKeyboardButton(RETURN_MENU_BUTTON,
+                                               callback_data=md5(RETURN_MENU_BUTTON.encode()).hexdigest()))
         return bot.send_message(chat_id, message_text, reply_markup=buttons)
 
     def store_button(message):
         send_redirect_message(message.from_user.id, 'Связаться с продавцом', 'Перейти',
-                              f'https://t.me/{STORE_SELLER_ACC}', ['Вернуться'])
+                              f'https://t.me/{STORE_SELLER_ACC}')
 
     def partnership_reply(message):
-        send_redirect_message(message.from_user.id, 'Сотрудничество', 'Сотрудничать',
-                              f'https://t.me/{PARTNERSHIP_ACC}', ['Вернуться'])
+        send_redirect_message(message.from_user.id, 'Сотрудничество', 'Сотрудничать', f'https://t.me/{PARTNERSHIP_ACC}')
 
     def enter_email(message):
         if not is_email_valid(message.text):
@@ -158,7 +158,7 @@ def start_bot():
     def select_author(message):
         users_status[message.from_user.id] = EMPTY
         bot.send_message(message.from_user.id, SELECT_AUTHOR_MESSAGE,
-                         reply_markup=make_buttons(promo.get_names()))
+                         reply_markup=make_buttons(promo.get_names(), False))
 
     def password_recovery(message):
         if not is_email_valid(message.text):
@@ -169,11 +169,8 @@ def start_bot():
         if data:
             bot.send_message(message.from_user.id, ANSWER_QUESTIONS)
             users_question[message.from_user.id] = 0
-            users_status[message.from_user.id] = USER_FINAL_QUESTION
             users_secrets[message.from_user.id] = (message.text, data)
-            bot.send_message(message.from_user.id, question_string(message.from_user.id),
-                             reply_markup=make_buttons(
-                                 list(QUESTIONS.values())[users_question[message.from_user.id]][0]), parse_mode='HTML')
+            next_question(message)
         else:
             email_not_found_try_again_or_support(message)
 
@@ -190,22 +187,27 @@ def start_bot():
         bot.send_message(message.from_user.id, EMAIL_IS_NOT_VALID)
 
     def answer_questions(message):
-        if md5(list(QUESTIONS.values())[users_question[message.from_user.id]][1].encode()).hexdigest() == message.data:
+        if is_answer_correct(message):
             bot.edit_message_reply_markup(message.message.chat.id, message.message.id, None)
             if users_question[message.from_user.id] != len(QUESTIONS) - 1:
+                users_question[message.from_user.id] += 1
                 next_question(message)
             else:
                 send_password(message)
         else:
             bot.send_message(message.from_user.id, QUESTION_FAILURE_MESSAGE)
 
+    def is_answer_correct(message):
+        return \
+            md5(list(QUESTIONS.values())[users_question[message.from_user.id]][1].encode()).hexdigest() == message.data
+
     def next_question(message):
-        users_question[message.from_user.id] += 1
+        # users_question[message.from_user.id] += 1
         users_status[message.from_user.id] = USER_FINAL_QUESTION
         bot.send_message(message.from_user.id,
                          question_string(message.from_user.id),
                          reply_markup=make_buttons(
-                             list(QUESTIONS.values())[users_question[message.from_user.id]][0]),
+                             list(QUESTIONS.values())[users_question[message.from_user.id]][0], False),
                          parse_mode='HTML')
 
     def send_password(message):

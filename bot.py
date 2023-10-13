@@ -227,7 +227,7 @@ def start_bot():
                   f'EMAILS: {" ".join(users_trial_emails[message.from_user.id])}\n'
                   f'USER: {message.text}\n'
                   f'Telegram username: {message.from_user.username}')
-        bot.send_message(message.from_user.id, GOT_LOGIN)
+        bot.send_message(message.from_user.id, GOT_LOGIN, reply_markup=menu_keyboard())
         delete_user(message.from_user.id)
 
     def use_promo(message):

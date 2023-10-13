@@ -20,7 +20,7 @@ conn = None
 def connect():
     global cur
 
-    sshtunnel.DEFAULT_LOGLEVEL = logging.DEBUG
+    sshtunnel.DEFAULT_LOGLEVEL = logging.INFO
     ssh_tunnel = SSHTunnelForwarder(
         (creds['SSH_HOST'], 22),
         ssh_username='app',

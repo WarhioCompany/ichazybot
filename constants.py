@@ -21,7 +21,7 @@ SUPPORT_EMAIL = 'ichazybot@gmail.com'
 TOKEN = '5941370506:AAF3BglIIg6VlCP-Ppa0FiOPIC2bDf1O4SU'
 
 # TEST TEST TEST TEST TEST !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#TOKEN = '6098601821:AAHmo_e03absU9-1eFoTwsoJs0GX2_koLPk'
+# TOKEN = '6098601821:AAHmo_e03absU9-1eFoTwsoJs0GX2_koLPk'
 
 RANDOM_GIF_BUTTON_NAME = 'Милашка'
 RECOVER_PASS_BUTTON_NAME = 'Восстановить пароль'

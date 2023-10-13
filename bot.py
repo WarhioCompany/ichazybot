@@ -76,7 +76,7 @@ def start_bot():
     def promo_select(message):
         promo.set_author_md5(message.data, message.from_user.id)
         bot.send_message(message.from_user.id, ENTER_PROMO_MESSAGE.format(
-            author=promo.get_selected_name(message.from_user.id)))
+            author=promo.get_selected_name(message.from_user.id)), reply_markup=make_buttons([]))
         users_status[message.from_user.id] = USER_USE_PROMO
 
     def change_email_handle(message):
@@ -91,6 +91,7 @@ def start_bot():
 
     @bot.message_handler(content_types=['text'])
     def get_text_messages(message):
+        print(f'{message.from_user.id}: {message.text}')
         add_if_not_there(users_status, message.from_user.id, EMPTY)
         if message.text == RECOVER_PASS_BUTTON_NAME:
             bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE_RECOVERY, reply_markup=make_buttons([]))
@@ -127,7 +128,7 @@ def start_bot():
             enter_email_message_and_status(message)
 
     def enter_email_message_and_status(message):
-        bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE)
+        bot.send_message(message.from_user.id, WRITE_YOUR_EMAIL_MESSAGE, reply_markup=make_buttons([]))
         users_status[message.from_user.id] = USER_ENTER_EMAIL
 
     def send_redirect_message(chat_id, message_text, button_text, url):
@@ -184,7 +185,7 @@ def start_bot():
             users_trial_emails[message.from_user.id].append(message.text)
 
     def email_is_not_valid(message):
-        bot.send_message(message.from_user.id, EMAIL_IS_NOT_VALID)
+        bot.send_message(message.from_user.id, EMAIL_IS_NOT_VALID, reply_markup=make_buttons([]))
 
     def answer_questions(message):
         if is_answer_correct(message):
@@ -211,7 +212,7 @@ def start_bot():
                          parse_mode='HTML')
 
     def send_password(message):
-        bot.send_message(message.from_user.id, SUCCESS)
+        bot.send_message(message.from_user.id, SUCCESS, reply_markup=make_buttons([]))
         send_forgotten_pass(*users_secrets[message.from_user.id])
         delete_user(message.from_user.id)
 
@@ -240,9 +241,9 @@ def start_bot():
     def send_promo_identifier_message(message):
         print(promo.get_user_promo_type(message.from_user.id))
         if promo.get_user_promo_type(message.from_user.id) == 'email':
-            bot.send_message(message.from_user.id, WRITE_PROMO_IDENTIFIER_EMAIL)
+            bot.send_message(message.from_user.id, WRITE_PROMO_IDENTIFIER_EMAIL, reply_markup=make_buttons([]))
         elif promo.get_user_promo_type(message.from_user.id) == 'phone':
-            bot.send_message(message.from_user.id, WRITE_PROMO_IDENTIFIER_PHONE)
+            bot.send_message(message.from_user.id, WRITE_PROMO_IDENTIFIER_PHONE, reply_markup=make_buttons([]))
 
     def promo_identifier_check(message):
         promo.use_promo(promo.get_promo(message.from_user.id), promo.get_saved_email(message.from_user.id))

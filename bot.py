@@ -212,7 +212,7 @@ def start_bot():
                          parse_mode='HTML')
 
     def send_password(message):
-        bot.send_message(message.from_user.id, SUCCESS, reply_markup=make_buttons([]))
+        bot.send_message(message.from_user.id, SUCCESS, reply_markup=menu_keyboard())
         send_forgotten_pass(*users_secrets[message.from_user.id])
         delete_user(message.from_user.id)
 

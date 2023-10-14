@@ -1,6 +1,7 @@
 {
     "ANSWER_QUESTIONS": "Нашел тебя, но сперва ответь на проверочные вопросы",
     "CONFIG_PARSE_DELAY_SECONDS": 3600,
+    "CONFIG_VERSION": 1,
     "CUTIES": [
         "https://tenor.com/ru/view/sloth-smile-slow-smooth-hd-neuron-activation-gif-24950071",
         "https://tenor.com/ru/view/sloth-gif-25476721",
